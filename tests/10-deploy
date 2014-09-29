@@ -1,0 +1,40 @@
+#!/usr/bin/python3
+
+import amulet
+import unittest
+
+class TestDeploy(unittest.TestCase):
+  @classmethod
+  def setUpClass(cls):
+    # Deifine the deployment object as a property
+    cls.d = amulet.Deployment()
+
+    # Add charms to the deployment
+    cls.d.add('drupal')
+
+
+    # send configuration to drupal so we can drive a login
+    #cls.d.configure('drupal', {'drupal-admin-password': 'hooba'})
+
+    # add relations
+    #cls.d.relate('drupal:db-mysql', 'mysql:db')
+
+    # dont forget to expose the proper services
+    #cls.d.expose('drupal')
+
+    # Give amulet some time to stand up our services and set up sentries
+    try:
+      cls.d.setup(timeout=1200)
+      cls.d.sentry.wait()
+    except amulet.helpers.TimeoutError:
+      amulet.raise_status(amulet.SKIP, msg="Environment wasn't stoodup in time")
+    except:
+      raise
+
+
+  def test_drupal_response(self):
+    pass
+
+
+if __name__ == '__main__':
+  unittest.main()
